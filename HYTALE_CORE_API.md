@@ -1,153 +1,153 @@
-# Hytale Server Core API Dokümantasyonu
+# Hytale Server Core API Documentation
 
-Bu belge, `com.hypixel.hytale.server.core` paketi ve alt paketlerindeki önemli sınıfların ve metotların detaylı açıklamalarını içerir. Bu bilgiler, sunucu yönetimi ve mod geliştirme süreçlerinde referans olması amacıyla hazırlanmıştır.
+This document contains detailed descriptions of important classes and methods in the `com.hypixel.hytale.server.core` package and its sub-packages. This information is prepared to serve as a reference for server management and mod development processes.
 
-## İçindekiler
-1. [Core (Ana Paket)](#core-ana-paket)
-2. [Auth (Kimlik Doğrulama)](#auth-kimlik-dogrulama)
-3. [Command (Komutlar)](#command-komutlar)
-4. [Event (Olaylar)](#event-olaylar)
-5. [Plugin (Eklentiler)](#plugin-eklentiler)
-6. [Permissions (İzinler)](#permissions-izinler)
-7. [Util (Araçlar)](#util-araclar)
+## Table of Contents
+1. [Core (Main Package)](#core-main-package)
+2. [Auth (Authentication)](#auth-authentication)
+3. [Command](#command)
+4. [Event](#event)
+5. [Plugin](#plugin)
+6. [Permissions](#permissions)
+7. [Util (Tools)](#util-tools)
 
 ---
 
-## Core (Ana Paket)
-**Paket:** `com.hypixel.hytale.server.core`
+## Core (Main Package)
+**Package:** `com.hypixel.hytale.server.core`
 
 ### `HytaleServer`
-Sunucunun merkezi yönetim sınıfıdır (Singleton). Sunucu yaşam döngüsünü (başlatma, döngü, kapatma), yöneticileri (plugin, command, event) ve modülleri koordine eder.
+The central management class of the server (Singleton). It coordinates the server lifecycle (startup, loop, shutdown), managers (plugin, command, event), and modules.
 
-**Önemli Public Metotlar:**
-*   `static HytaleServer get()`: Çalışan sunucunun tekil örneğini (instance) döndürür.
-*   `EventBus getEventBus()`: Sunucu genelindeki olayların yönetildiği `EventBus` nesnesini döndürür.
-*   `PluginManager getPluginManager()`: Eklenti yöneticisini döndürür.
-*   `CommandManager getCommandManager()`: Komut yöneticisini döndürür.
-*   `HytaleServerConfig getConfig()`: Sunucu yapılandırma dosyasını (`hytale-server.json`) temsil eden nesneyi döndürür.
-*   `void shutdownServer(ShutdownReason reason)`: Sunucuyu belirtilen bir sebeple (`ShutdownReason`) kapatır.
-*   `String getServerName()`: Konfigürasyonda ayarlanan sunucu ismini döndürür.
-*   `boolean isBooted()`: Sunucunun tamamen açılıp açılmadığını belirtir.
-*   `boolean isShuttingDown()`: Sunucunun kapanma sürecinde olup olmadığını belirtir.
-*   `Instant getBoot()`: Sunucunun başlatılma zamanını döndürür.
+**Important Public Methods:**
+*   `static HytaleServer get()`: Returns the single instance of the running server.
+*   `EventBus getEventBus()`: Returns the `EventBus` object where server-wide events are managed.
+*   `PluginManager getPluginManager()`: Returns the plugin manager.
+*   `CommandManager getCommandManager()`: Returns the command manager.
+*   `HytaleServerConfig getConfig()`: Returns the object representing the server configuration file (`hytale-server.json`).
+*   `void shutdownServer(ShutdownReason reason)`: Shuts down the server for the specified reason (`ShutdownReason`).
+*   `String getServerName()`: Returns the server name set in the configuration.
+*   `boolean isBooted()`: Indicates whether the server has fully started.
+*   `boolean isShuttingDown()`: Indicates whether the server is in the process of shutting down.
+*   `Instant getBoot()`: Returns the time when the server was started.
 
 ### `HytaleServerConfig`
-Sunucu ayarlarını tutar ve yönetir. Değişiklikler diskteki dosyaya kaydedilebilir.
+Holds and manages server settings. Changes can be saved to the file on disk.
 
-**Önemli Public Metotlar:**
-*   `static HytaleServerConfig load()`: Varsayılan yoldan konfigürasyonu yükler.
-*   `static CompletableFuture<Void> save(HytaleServerConfig config)`: Konfigürasyonu diske kaydeder.
-*   `void setMotd(String motd)`: Sunucu listesinde görünen mesajı (MOTD) ayarlar.
-*   `int getMaxPlayers()`: Maksimum oyuncu sayısını döndürür.
-*   `void setMaxPlayers(int maxPlayers)`: Maksimum oyuncu sayısını ayarlar.
-*   `Module getModule(String moduleName)`: İsmi verilen modülün (örn. "WorldModule") ayarlarını getirir.
+**Important Public Methods:**
+*   `static HytaleServerConfig load()`: Loads the configuration from the default path.
+*   `static CompletableFuture<Void> save(HytaleServerConfig config)`: Saves the configuration to disk.
+*   `void setMotd(String motd)`: Sets the message of the day (MOTD) visible in the server list.
+*   `int getMaxPlayers()`: Returns the maximum number of players.
+*   `void setMaxPlayers(int maxPlayers)`: Sets the maximum number of players.
+*   `Module getModule(String moduleName)`: Retrieves the settings of the named module (e.g., "WorldModule").
 
 ---
 
-## Auth (Kimlik Doğrulama)
-**Paket:** `com.hypixel.hytale.server.core.auth`
+## Auth (Authentication)
+**Package:** `com.hypixel.hytale.server.core.auth`
 
 ### `ServerAuthManager`
-Sunucudaki kimlik doğrulama işlemlerini yönetir. Oyuncuların geçerliliğini kontrol eder.
+Manages authentication processes on the server. Checks the validity of players.
 
-**Önemli Public Metotlar:**
-*   `static ServerAuthManager getInstance()`: Yönetici örneğini döndürür.
-*   `void initialize()`: Kimlik doğrulama anahtarlarını ve yapılarını hazırlar.
-*   `AuthMode getAuthMode()`: Sunucunun kimlik doğrulama modunu (ONLINE, OFFLINE vb.) döndürür.
+**Important Public Methods:**
+*   `static ServerAuthManager getInstance()`: Returns the manager instance.
+*   `void initialize()`: Prepares authentication keys and structures.
+*   `AuthMode getAuthMode()`: Returns the server's authentication mode (ONLINE, OFFLINE, etc.).
 
 ### `SessionServiceClient`
-Hytale oturum servisleriyle (Backend API) iletişim kurar. Oyuncu oturumlarını doğrulamak ve profil bilgilerini çekmek için kullanılır.
+Communicates with Hytale session services (Backend API). Used to verify player sessions and retrieve profile information.
 
-**Önemli Public Metotlar:**
-*   `CompletableFuture<String> requestAuthorizationGrantAsync(...)`: Yetkilendirme izni ister.
-*   `CompletableFuture<String> exchangeAuthGrantForTokenAsync(...)`: İzni erişim anahtarına (token) çevirir.
-*   `GameProfile[] getGameProfiles(String oauthAccessToken)`: Erişim anahtarı ile oyuncu profillerini getirir.
-*   `GameSessionResponse createGameSession(...)`: Yeni bir oyun oturumu başlatır.
+**Important Public Methods:**
+*   `CompletableFuture<String> requestAuthorizationGrantAsync(...)`: Requests authorization grant.
+*   `CompletableFuture<String> exchangeAuthGrantForTokenAsync(...)`: Exchanges the grant for an access token.
+*   `GameProfile[] getGameProfiles(String oauthAccessToken)`: Retrieves player profiles using the access token.
+*   `GameSessionResponse createGameSession(...)`: Starts a new game session.
 
 ### `PlayerAuthentication`
-Bir oyuncunun kimlik doğrulama bilgilerini (UUID, Kullanıcı adı) tutan veri sınıfıdır.
+A data class holding a player's authentication information (UUID, Username).
 
 ---
 
-## Command (Komutlar)
-**Paket:** `com.hypixel.hytale.server.core.command.system`
+## Command
+**Package:** `com.hypixel.hytale.server.core.command.system`
 
 ### `CommandManager`
-Komut sisteminin kalbidir. Komutları kaydeder, ayrıştırır ve ilgili işlemciye yönlendirir.
+The heart of the command system. It registers, parses, and routes commands to the relevant processor.
 
-**Önemli Public Metotlar:**
-*   `void registerCommands()`: Varsayılan sistem komutlarını kaydeder.
-*   `CommandRegistration register(AbstractCommand command)`: Yeni bir komut nesnesini sisteme kaydeder. Modlarda özel komut eklemek için kullanılır.
-*   `CompletableFuture<Void> handleCommand(CommandSender sender, String commandString)`: Bir komut satırını, gönderen kişi adına çalıştırır.
-*   `Map<String, AbstractCommand> getCommandRegistration()`: Kayıtlı tüm komutların listesini harita olarak döndürür.
+**Important Public Methods:**
+*   `void registerCommands()`: Registers default system commands.
+*   `CommandRegistration register(AbstractCommand command)`: Registers a new command object to the system. Used to add custom commands in mods.
+*   `CompletableFuture<Void> handleCommand(CommandSender sender, String commandString)`: Executes a command line on behalf of the sender.
+*   `Map<String, AbstractCommand> getCommandRegistration()`: Returns a map of all registered commands.
 
 ### `CommandSender`
-Komutu çalıştıran varlığı temsil eden arayüzdür. `Player` veya `ConsoleSender` olabilir.
+An interface representing the entity executing the command. Can be `Player` or `ConsoleSender`.
 
-**Metotlar:**
-*   `void sendMessage(Message message)`: Göndericiye mesaj iletir.
-*   `String getName()`: Göndericinin ismini döndürür.
-*   `boolean hasPermission(String permission)`: Belirli bir yetkiye sahip olup olmadığını kontrol eder.
+**Methods:**
+*   `void sendMessage(Message message)`: Sends a message to the sender.
+*   `String getName()`: Returns the name of the sender.
+*   `boolean hasPermission(String permission)`: Checks if the sender has specific permission.
 
 ---
 
-## Event (Olaylar)
-**Paket:** `com.hypixel.hytale.event` (ve `com.hypixel.hytale.server.core.event`)
+## Event
+**Package:** `com.hypixel.hytale.event` (and `com.hypixel.hytale.server.core.event`)
 
 ### `EventBus`
-Olay tabanlı sistemin merkezidir. Olayların yayınlanmasını (dispatch) ve dinlenmesini (listen) sağlar.
+The center of the event-based system. Enables dispatching and listening to events.
 
-**Önemli Public Metotlar:**
-*   `EventRegistration register(Class<T> eventClass, Consumer<T> consumer)`: Belirli bir olay sınıfı için dinleyici (listener) kaydeder.
-*   `IEventDispatcher dispatchFor(Class<T> eventClass)`: Bir olay sınıfı için yayınlayıcı döndürür.
+**Important Public Methods:**
+*   `EventRegistration register(Class<T> eventClass, Consumer<T> consumer)`: Registers a listener for a specific event class.
+*   `IEventDispatcher dispatchFor(Class<T> eventClass)`: Returns a publisher for an event class.
 
-### Örnek Olaylar (`server.core.event.events`)
-*   `BootEvent`: Sunucu açıldığında tetiklenir.
-*   `ShutdownEvent`: Sunucu kapanmaya başladığında tetiklenir.
+### Example Events (`server.core.event.events`)
+*   `BootEvent`: Triggered when the server starts.
+*   `ShutdownEvent`: Triggered when the server begins to shut down.
 
 ---
 
-## Plugin (Eklentiler)
-**Paket:** `com.hypixel.hytale.server.core.plugin`
+## Plugin
+**Package:** `com.hypixel.hytale.server.core.plugin`
 
 ### `PluginManager`
-Sunucuya yüklenen eklentileri (Mods/Plugins) yönetir.
+Manages plugins (Mods/Plugins) loaded on the server.
 
-**Önemli Public Metotlar:**
-*   `List<PluginBase> getPlugins()`: Yüklü ve aktif tüm eklentileri listeler.
-*   `PluginBase getPlugin(PluginIdentifier identifier)`: Belirli bir ID'ye sahip eklentiyi getirir.
-*   `void setup()`: Eklentilerin kurulum aşamasını başlatır.
-*   `void start()`: Eklentileri başlatır (enable eder).
-*   `void shutdown()`: Eklentileri güvenli bir şekilde durdurur.
+**Important Public Methods:**
+*   `List<PluginBase> getPlugins()`: Lists all loaded and active plugins.
+*   `PluginBase getPlugin(PluginIdentifier identifier)`: Retrieves the plugin with the specified ID.
+*   `void setup()`: Starts the setup phase of plugins.
+*   `void start()`: Starts (enables) the plugins.
+*   `void shutdown()`: Safely stops the plugins.
 
 ### `PluginBase`
-Tüm eklentilerin ana sınıfıdır. Mod geliştirirken bu sınıf miras alınır (genellikle `JavaPlugin` üzerinden).
+The base class for all plugins. This class is inherited when developing mods (usually via `JavaPlugin`).
 
 ---
 
-## Permissions (İzinler)
-**Paket:** `com.hypixel.hytale.server.core.permissions`
+## Permissions
+**Package:** `com.hypixel.hytale.server.core.permissions`
 
 ### `HytalePermissions`
-Sunucu içindeki standart izinlerin (permission nodes) tanımlandığı sabitleri içerir.
+Contains constants defining standard permissions (permission nodes) within the server.
 
-**Önemli Sabitler:**
-*   `COMMAND_BASE`: Temel komut yetkisi (`hytale.command`).
-*   `ASSET_EDITOR`: Varlık editörü yetkisi.
-*   `FLY_CAM`: Fly kamera kullanım yetkisi.
-*   `fromCommand(String name)`: Bir komut ismi için yetki stringi oluşturur (örn. `hytale.command.give`).
+**Important Constants:**
+*   `COMMAND_BASE`: Basic command permission (`hytale.command`).
+*   `ASSET_EDITOR`: Asset editor permission.
+*   `FLY_CAM`: Fly camera usage permission.
+*   `fromCommand(String name)`: Creates a permission string for a command name (e.g., `hytale.command.give`).
 
 ---
 
-## Util (Araçlar)
-**Paket:** `com.hypixel.hytale.server.core.util`
+## Util (Tools)
+**Package:** `com.hypixel.hytale.server.core.util`
 
 ### `MessageUtil`
-Mesajların biçimlendirilmesi, renklendirilmesi ve oyunculara iletilmesi için yardımcı metotlar içerir.
+Contains helper methods for formatting, coloring, and sending messages to players.
 
-**Önemli Public Metotlar:**
-*   `AttributedString toAnsiString(Message message)`: Mesaj nesnesini konsolda renkli görünecek şekilde ANSI formatına çevirir.
-*   `formatText(String text, ...)`: Metin içindeki parametreleri ({0}, {name} gibi) değerleriyle değiştirir.
+**Important Public Methods:**
+*   `AttributedString toAnsiString(Message message)`: Converts a message object to ANSI format to appear colored in the console.
+*   `formatText(String text, ...)`: Replaces parameters (like {0}, {name}) in the text with their values.
 
-### `NotificationUtil` (İncelenen diğer araç)
-Bildirim gönderme işlemlerini kolaylaştırır.
+### `NotificationUtil` (Other tool examined)
+Simplifies sending notifications.

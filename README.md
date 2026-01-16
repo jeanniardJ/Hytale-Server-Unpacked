@@ -3,6 +3,10 @@
 ## Languages
 [Türkçe (Turkish)](README_TR.md)
 
+## Core API Documentation
+- [English](HYTALE_CORE_API.md)
+- [Türkçe](HYTALE_CORE_API_TR.md)
+
 
 This documentation is auto-generated from the decompiled source code.
 
